@@ -1,0 +1,6 @@
+language: python
+rvm:
+  -3.7
+install:
+  - pip install pints/.
+  - pip install -r pints/requirements.txt
