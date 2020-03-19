@@ -10,7 +10,7 @@ current_dir=os.getcwd()
 dir_list=current_dir.split("/")
 upper_level_list=dir_list[:dir_list.index("SV_paper")+1]
 upper_level=("/").join(upper_level_list)
-class_loc=upper_level+"/simulation"
+class_loc=upper_level+"/src"
 dir_path = os.path.dirname(os.path.realpath(__file__))
 unit_dict={
     "E_0": "V",

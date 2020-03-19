@@ -8,7 +8,7 @@ current_dir=os.getcwd()
 dir_list=current_dir.split("/")
 upper_level_list=dir_list[:dir_list.index("SV_paper")+1]
 upper_level=("/").join(upper_level_list)
-class_loc=upper_level+"/simulation"
+class_loc=upper_level+"/src"
 sys.path.insert(0, class_loc)
 from single_e_class_unified import single_electron
 from harmonics_plotter import harmonics

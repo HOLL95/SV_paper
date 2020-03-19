@@ -1,25 +1,17 @@
 cmake_minimum_required(VERSION 3.1)
 
-project(SV_paper)
+project(isolver_martin_brent)
 
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_EXPORT_COMPILE_COMMANDS 1 )
+FIND_PACKAGE( pybind11 REQUIRED )
 
-set(include_dirs "")
-set(lib_dir "lib")
+FIND_PACKAGE(PythonInterp 3)
+FIND_PACKAGE(PythonLibs   3)
 
-# Pybind11
-add_subdirectory(${lib_dir}/pybind11)
-
+set(include_dir "lib")
+set(source_dir "src")
 # Boost
-list(APPEND include_dirs ${lib_dir}/boost)
-
-set(source_dir simulation}
-
-set(source_files
-    ${source_dir}/surface_process_brent.cpp
-    )
-
-
+list(APPEND include_dirs ${include_dir}/boost)
+# Pybind11
+add_subdirectory(${include_dir}/pybind11)
 include_directories(${source_dir} ${include_dirs})
+pybind11_add_module(isolver_martin_brent "${source_dir}/surface_process_brent.cpp")
