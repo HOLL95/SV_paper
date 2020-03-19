@@ -2,10 +2,6 @@ cmake_minimum_required(VERSION 3.1)
 
 project(isolver_martin_brent)
 
-FIND_PACKAGE( pybind11 REQUIRED )
-
-FIND_PACKAGE(PythonInterp 3)
-FIND_PACKAGE(PythonLibs   3)
 
 set(include_dir "lib")
 set(source_dir "src")
