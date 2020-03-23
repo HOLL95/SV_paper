@@ -23,7 +23,7 @@ class dispersion:
                     raise ValueError("Normal distribution requires "+self.simulation_options["dispersion_parameters"][i]+"_mean and " + self.simulation_options["dispersion_parameters"][i]+"_std")
             elif self.simulation_options["dispersion_distributions"][i]=="lognormal":
                 if (self.simulation_options["dispersion_parameters"][i]+"_shape" not in optim_list)  or (self.simulation_options["dispersion_parameters"][i]+"_scale" not in optim_list):
-                    raise ValueError("Lognormal distribution requires "+self.simulation_options["dispersion_parameters"][i]+"_shape and " + self.simulation_options["dispersion_parameters"][i]+"_loc and "  + self.simulation_options["dispersion_parameters"][i]+"_scale")
+                    raise ValueError("Lognormal distribution requires "+self.simulation_options["dispersion_parameters"][i]+"_shape and " + + self.simulation_options["dispersion_parameters"][i]+"_scale")
             else:
                 raise KeyError(self.simulation_options["dispersion_distributions"][i]+" distribution not implemented")
     def generic_dispersion(self, nd_dict, GH_dict=None):
