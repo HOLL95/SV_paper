@@ -63,9 +63,9 @@ class dispersion:
                     param_weights=np.zeros(self.simulation_options["dispersion_bins"][i])
                     param_weights[0]=lognorm.cdf(param_vals[0],param_shape, loc=param_loc, scale=param_scale)
                     param_midpoints=np.zeros(self.simulation_options["dispersion_bins"][i])
-                    param_midpoints[0]=norm.ppf((1e-4/2), loc=param_mean, scale=param_std)
+                    param_midpoints[0]=lognorm.ppf((1e-4/2), param_shape, loc=param_loc, scale=param_scale)
                     for j in range(1, self.simulation_options["dispersion_bins"][i]):
-                        param_weights[j]=norm.cdf(param_vals[j],param_shape, loc=param_loc, scale=param_scale)-norm.cdf(param_vals[j-1],param_shape, loc=param_loc, scale=param_scale)
+                        param_weights[j]=lognorm.cdf(param_vals[j],param_shape, loc=param_loc, scale=param_scale)-lognorm.cdf(param_vals[j-1],param_shape, loc=param_loc, scale=param_scale)
                         param_midpoints[j]=(param_vals[j-1]+param_vals[j])/2
                     value_arrays.append(param_midpoints)
                     weight_arrays.append(param_weights)

@@ -5,7 +5,10 @@ import math
 import numpy as np
 import itertools
 import multiprocessing as mp
-import matplotlib.pyplot as plt
+try:
+    import matplotlib.pyplot as plt
+except:
+    pass
 from params_class import params
 from dispersion_class import dispersion
 from decimal import Decimal
@@ -39,8 +42,8 @@ class single_electron:
         self.other_values=other_values
         self.check_inputs()
         self.optim_list=self.simulation_options["optim_list"]
-        self.harmonic_range=self.other_values["harmonic_range"]
-        self.num_harmonics=len(self.harmonic_range)
+        self.simulation_options["harmonic_range"]=self.other_values["harmonic_range"]
+        self.num_harmonics=len(self.simulation_options["harmonic_range"])
         self.filter_val=self.other_values["filter_val"]
         self.bounds_val=self.other_values["bounds_val"]
         self.time_array=[]
@@ -91,7 +94,7 @@ class single_electron:
         self.def_optim_list(self.simulation_options["optim_list"])
         frequencies=np.fft.fftfreq(len(self.time_vec), self.time_vec[1]-self.time_vec[0])
         self.frequencies=frequencies[np.where(frequencies>0)]
-        last_point= (self.harmonic_range[-1]*self.nd_param.nd_param_dict["omega"])+(self.nd_param.nd_param_dict["omega"]*self.filter_val)
+        last_point= (self.simulation_options["harmonic_range"][-1]*self.nd_param.nd_param_dict["omega"])+(self.nd_param.nd_param_dict["omega"]*self.filter_val)
         self.test_frequencies=frequencies[np.where(self.frequencies<last_point)]
         self.param_bounds=param_bounds
         if self.simulation_options["experimental_fitting"]==True:
@@ -106,7 +109,6 @@ class single_electron:
         try:
             disp_idx=self.simulation_options["dispersion_distributions"].index("normal")
         except:
-            print(dispersion_distributions)
             raise KeyError("GH quadrature is only appropriate for a normal distribution")
         nodes=self.simulation_options["dispersion_bins"][disp_idx]
         labels=["nodes", "weights", "normal_weights"]
@@ -218,11 +220,11 @@ class single_electron:
         if "fourier_scaling" in self.simulation_options:
             if self.simulation_options["fourier_scaling"]!=None:
                 scale_flag=True
-        if sum(np.diff(self.harmonic_range))!=len(self.harmonic_range)-1 or scale_flag==True or self.other_values["filter_val"]!=0.5:
+        if sum(np.diff(self.simulation_options["harmonic_range"]))!=len(self.simulation_options["harmonic_range"])-1 or scale_flag==True or self.other_values["filter_val"]!=0.5:
             results=np.zeros(len(top_hat), dtype=complex)
             for i in range(0, self.num_harmonics):
-                true_harm_n=true_harm*self.harmonic_range[i]
-                index=tuple(np.where((frequencies<(true_harm_n+(self.nd_param.nd_param_dict["omega"]*self.filter_val))) & (frequencies>true_harm_n-(self.nd_param.nd_param_dict["omega"]*self.filter_val))))
+                true_harm_n=true_harm*self.simulation_options["harmonic_range"][i]
+                index=tuple(np.where((frequencies<(true_harm_n+(true_harm*self.filter_val))) & (frequencies>true_harm_n-(true_harm*self.filter_val))))
                 if scale_flag==True:
                     filter_bit=abs(top_hat[index])
                     min_f=min(filter_bit)
@@ -232,13 +234,15 @@ class single_electron:
                     filter_bit=top_hat[index]
                 results[index]=filter_bit
         else:
-            first_harm=(self.harmonic_range[0]*true_harm)-(self.nd_param.nd_param_dict["omega"]*self.filter_val)
-            last_harm=(self.harmonic_range[-1]*true_harm)+(self.nd_param.nd_param_dict["omega"]*self.filter_val)
+            first_harm=(self.simulation_options["harmonic_range"][0]*true_harm)-(true_harm*self.filter_val)
+            last_harm=(self.simulation_options["harmonic_range"][-1]*true_harm)+(true_harm*self.filter_val)
             likelihood=top_hat[np.where((frequencies>first_harm) & (frequencies<last_harm))]
             results=np.zeros(len(top_hat), dtype=complex)
             results[np.where((frequencies>first_harm) & (frequencies<last_harm))]=likelihood
+        plt.plot(frequencies, results)
+        plt.show()
         comp_results=np.append((np.real(results)), np.imag(results))
-        return abs(results)
+        return comp_results
     def abs_transform(self, data):
         window=np.hanning(len(data))
         hanning_transform=np.multiply(window, data)
@@ -313,11 +317,10 @@ class single_electron:
         return results
     def paralell_disperse(self, solver):
         time_series=np.zeros(len(self.time_vec))
-        if "GH_quadrature" in self.simulation_options:
-            if self.simulation_options["GH_quadrature"]==True:
-                sim_params, values, weights=self.disp_class.generic_dispersion((self.nd_param.nd_param_dict), self.other_values["GH_dict"])
+        if "GH_quadrature" in self.simulation_options and self.simulation_options["GH_quadrature"]==True:
+            sim_params, values, weights=self.disp_class.generic_dispersion((self.nd_param.nd_param_dict), self.other_values["GH_dict"])
         else:
-                sim_params, values, weights=self.disp_class.generic_dispersion((self.nd_param.nd_param_dict))
+            sim_params, values, weights=self.disp_class.generic_dispersion((self.nd_param.nd_param_dict))
 
         for i in range(0, len(weights)):
             for j in range(0, len(sim_params)):
@@ -402,6 +405,7 @@ class single_electron:
                 if self.simulation_options["experimental_fitting"]==True:
                     plt.subplot(1,2,1)
                     plt.plot(self.other_values["experiment_voltage"],time_series)
+                    plt.plot(self.other_values["experiment_voltage"],self.secret_data_time_series, alpha=0.7)
                     plt.subplot(1,2,2)
                     plt.plot(self.other_values["experiment_time"],time_series)
                     plt.plot(self.other_values["experiment_time"],self.secret_data_time_series, alpha=0.7)
