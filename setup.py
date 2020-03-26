@@ -59,6 +59,8 @@ class CMakeBuild(build_ext):
 setup(
     name='SV_paper',
     version='0.0.1',
+    install_requires=["pints"],
+    dependency_links=[''.join([os.path.join(os.getcwd(), 'lib', 'pints')])],
     description='The companion code for the sinusoidal voltammetry paper',
     long_description='',
     ext_modules=[CMakeExtension('SV_paper')],
