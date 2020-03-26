@@ -22,7 +22,7 @@ Finally, you can install this repository using ```pip3```
 ```
 pip3 install -r requirements.txt
 ```
-If you do not have root access but have all the required packages installed on your system then you can install a user only version 
+If you do not have install priveliges but have all the required packages installed on your system then you can install a user only version 
 ```
 pip3 install -r requirements.txt --user
 ```
