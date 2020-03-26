@@ -26,3 +26,4 @@ If you do not have root access but have all the required packages installed on y
 ```
 pip3 install -r requirements.txt --user
 ```
+Simulation code can be found in the ```SV_paper/src``` directory, and code to generate each of the figures in the main body of the paper can be found in ```SV_paper/figures```
