@@ -239,8 +239,8 @@ class single_electron:
             likelihood=top_hat[np.where((frequencies>first_harm) & (frequencies<last_harm))]
             results=np.zeros(len(top_hat), dtype=complex)
             results[np.where((frequencies>first_harm) & (frequencies<last_harm))]=likelihood
-        comp_results=np.append((np.real(results)), np.imag(results))
-        return comp_results
+        #comp_results=np.append((np.real(results)), np.imag(results))
+        return results
     def abs_transform(self, data):
         window=np.hanning(len(data))
         hanning_transform=np.multiply(window, data)
