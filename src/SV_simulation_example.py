@@ -98,6 +98,9 @@ To test individual parameter values we use the test_vals() function with a list 
 test_current=SV_test.test_vals([param_list[x] for x in simulation_options["optim_list"]], "timeseries")
 test_voltage=SV_test.define_voltages()
 plt.plot(test_voltage, test_current)
+plt.xlabel("Nondimensional voltage")
+ply.ylabel("Nondimensional current")
+plt.title("SV simulation example with transient")
 plt.show()
 """
 We will now add normal dispersion for E0 and alpha. We first update the paramater and param bounds dictionaries with a mean and standard deviation.
@@ -129,6 +132,9 @@ SV_test=single_electron(file_name=None, dim_parameter_dictionary=param_list, sim
 test_current=SV_test.test_vals([param_list[x] for x in simulation_options["optim_list"]], "timeseries")
 test_voltage=SV_test.define_voltages(transient=False)
 plt.plot(test_voltage, test_current)
+plt.xlabel("Nondimensional voltage")
+ply.ylabel("Nondimensional current")
+plt.title("SV simulation example with dispersion and no transient")
 plt.show()
 """
 If we want to simulate the same parameters with a ramped input, we reduce the amplitude of the input potential, and change the simulation method. The ramped method uses a different non-dimensionalisation for the time,
@@ -146,4 +152,7 @@ test_current=ramp_test.test_vals([param_list[x] for x in simulation_options["opt
 test_voltage=ramp_test.define_voltages()
 test_time=ramp_test.time_vec
 plt.plot(test_time, test_current)
+plt.xlabel("Nondimensional time")
+ply.ylabel("Nondimensional current")
+plt.title("Ramped simulation example with dispersion")
 plt.show()
