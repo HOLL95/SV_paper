@@ -99,7 +99,7 @@ test_current=SV_test.test_vals([param_list[x] for x in simulation_options["optim
 test_voltage=SV_test.define_voltages()
 plt.plot(test_voltage, test_current)
 plt.xlabel("Nondimensional voltage")
-ply.ylabel("Nondimensional current")
+plt.ylabel("Nondimensional current")
 plt.title("SV simulation example with transient")
 plt.show()
 """
@@ -133,7 +133,7 @@ test_current=SV_test.test_vals([param_list[x] for x in simulation_options["optim
 test_voltage=SV_test.define_voltages(transient=False)
 plt.plot(test_voltage, test_current)
 plt.xlabel("Nondimensional voltage")
-ply.ylabel("Nondimensional current")
+plt.ylabel("Nondimensional current")
 plt.title("SV simulation example with dispersion and no transient")
 plt.show()
 """
@@ -153,6 +153,6 @@ test_voltage=ramp_test.define_voltages()
 test_time=ramp_test.time_vec
 plt.plot(test_time, test_current)
 plt.xlabel("Nondimensional time")
-ply.ylabel("Nondimensional current")
+plt.ylabel("Nondimensional current")
 plt.title("Ramped simulation example with dispersion")
 plt.show()
