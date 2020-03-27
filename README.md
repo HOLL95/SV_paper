@@ -1,5 +1,5 @@
 # Sinusoidal voltammetry paper code
-This repository acts as a companion for our paper about using parameterising sinusoidal voltammetry experiments. To install and run it, you will require a distribution of linux, git, python3.6 or higher (and the associated package manager pip), boost and cmake. If you do not have these programs they can be installed on e.g. Ubuntu can be done using ```apt```. 
+This repository acts as a companion for our paper about using parameterising sinusoidal voltammetry experiments. To install and run it, you will require a distribution of linux, git, python3.6 or higher (and the associated package manager pip), boost and cmake. If you do not have these programs they can be installed on e.g. Ubuntu using ```apt```. 
 ```
 sudo apt-get update
 sudo apt-get install git python3.6 pip3 cmake libboost-all-dev
