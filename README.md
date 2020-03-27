@@ -5,7 +5,7 @@ sudo apt-get update
 sudo apt-get install git python3.6 pip3 cmake libboost-all-dev
 ```
 
-Once these packages are installed, you can clone this repository and it's submodules, 
+Once these packages are installed, you can clone this repository and its submodules, 
 i.e. 
 
 ```
