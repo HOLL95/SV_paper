@@ -98,7 +98,7 @@ file="Noramp_2_cv_high_ru_alpha_disp"
 CMAES_path=("/").join([upper_level, "Inferred_results", "CMAES"])
 noramp_results=single_electron(CMAES_path+"/"+file)
 print(noramp_results.simulation_options["GH_quadrature"])
-noramp_results.simulation_options["dispersion_bins"]=[16,16]
+noramp_results.simulation_options["dispersion_bins"]=[15,15]
 noramp_results.dim_dict["phase"]=3*math.pi/2
 plot_params=["E0_mean", "E0_std","k_0","Ru","Cdl","CdlE1", "cap_phase", "alpha_mean", "alpha_std"]
 param_vals=[0.25, 0.05, 100, 100,1e-5, 1e-5,3*math.pi/2, 0.5, 0.05]

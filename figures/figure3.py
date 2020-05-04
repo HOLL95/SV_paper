@@ -34,6 +34,8 @@ for j in range(0, len(files)):
             labels=experiment[j]
             if j==0:
                 plot_chain=chain_appender(chains, i)
+
+
                 if titles[pos[i]]=='$C_{dl}$':
                     axes.hist(plot_chain, alpha=0.4,bins=20,label=str(labels))#edgecolor='black'
                     axes.xaxis.set_major_formatter(FormatStrFormatter('%.4e'))
@@ -48,6 +50,7 @@ for j in range(0, len(files)):
                     axes.xaxis.set_major_formatter(FormatStrFormatter('%.4e'))
                 else:
                     axes.hist(plot_chain, alpha=0.4,bins=20,label=str(labels))
+            
             plt.xticks(rotation=15)
             axes.locator_params(nbins=3)
             axes.set_xlabel(titles[pos[i]])
