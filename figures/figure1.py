@@ -10,6 +10,11 @@ upper_level_list=dir_list[:dir_list.index("SV_paper")+1]
 upper_level=("/").join(upper_level_list)
 class_loc=upper_level+"/src"
 sys.path.insert(0, class_loc)
+try:
+    from PIL import Image
+    resize=True
+except:
+    resize=False
 from single_e_class_unified import single_electron
 from harmonics_plotter import harmonics
 import pints.plot
@@ -64,7 +69,7 @@ fourier_ylabels=["Real", "Imaginary"]
 fourier_times=[ramp_time_results, time_results]
 fourier_currents=[ramped_cmaes_time, cmaes_time]
 harm_xlabels=["Time(s)", "Voltage(V)"]
-fig=multiplot(2, 4, **{"harmonic_position":3, "num_harmonics":num_harms, "fourier_position":2,"orientation":"portrait", "plot_width":6, "col_spacing":2})
+fig=multiplot(2, 4, **{"harmonic_position":3, "num_harmonics":num_harms, "fourier_position":2,"orientation":"portrait", "plot_width":6, "col_spacing":2, "font_size":15})
 keys=sorted(fig.axes_dict.keys())
 
 fig.axes_dict["col1"][0].plot(ramp_time_results, ramp_voltage_results)
@@ -82,7 +87,8 @@ fig.axes_dict["col2"][1].set_ylabel("Current(mA)")
 for i in range(0, 2):
     for j in range(0, 2):
         pos=(i*2)+j
-        fig.axes_dict["col3"][pos].set_xlabel("Frequency(Hz)")
+        if j==1:
+            fig.axes_dict["col3"][pos].set_xlabel("Frequency(Hz)")
         fig.axes_dict["col3"][pos].set_ylabel(fourier_ylabels[j])
         if j==0:
             fig.axes_dict["col3"][pos].set_xticks([])
@@ -91,19 +97,25 @@ for i in range(0, 2):
     for j in range(0, num_harms):
         if i==0:
             x=ramp_time_results
+            if j==3:
+                fig.axes_dict["col4"][pos].set_ylabel("Current($\\mu A$)")
         else:
             x=voltage_results
+            if j==4:
+                fig.axes_dict["col4"][pos].set_ylabel("Current($\\mu A$)")
         pos=(i*num_harms)+j
         fig.axes_dict["col4"][pos].plot(x, all_harms[i][j,:]*1e3)
+
         twiny=fig.axes_dict["col4"][pos].twinx()
         twiny.set_ylabel(j+1, rotation=0)
-        twiny.set_yticks([])
+        twiny.set_yticklabels([])
         if j==num_harms-1:
             fig.axes_dict["col4"][pos].set_xlabel(harm_xlabels[i])
         else:
             fig.axes_dict["col4"][pos].set_xticks([])
-        if j==num_harms//2:
-            fig.axes_dict["col4"][pos].set_ylabel("Current($\\mu A$)")
+        ticks=fig.axes_dict["col4"][pos].get_yticks()
+        fig.axes_dict["col4"][pos].set_yticks([ticks[1], ticks[-2]])
+
 letter_count=0
 y_pos=[1.1, 1.1, 1.195, 1.58]
 for i in range(0, len(keys)):
@@ -120,5 +132,10 @@ fig.set_size_inches((14, 9))
 plt.subplots_adjust(left=0.05, bottom=0.05, right=0.99, top=0.94, wspace=0.29, hspace=0.2)
 plt.show()
 save_path="experiment_comparison.png"
-#fig.savefig(save_path, dpi=500)
-plt.show()
+fig.savefig(save_path, dpi=500)
+    img = Image.open(save_path)
+    basewidth = float(img.size[0])//2
+    wpercent = (basewidth/float(img.size[0]))
+    hsize = int((float(img.size[1])*float(wpercent)))
+    img = img.resize((int(basewidth),hsize), Image.ANTIALIAS)
+    img.save(save_path, "PNG", quality=95, dpi=(500, 500))

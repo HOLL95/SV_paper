@@ -10,77 +10,86 @@ upper_level_list=dir_list[:dir_list.index("SV_paper")+1]
 upper_level=("/").join(upper_level_list)
 class_loc=upper_level+"/src"
 sys.path.insert(0, class_loc)
-from single_e_class_unified import single_electron
-from harmonics_plotter import harmonics
 from single_e_class_unified  import single_electron
 import pints.plot
 import math
 from multiplotter import multiplot
 from harmonics_plotter import harmonics
-import time
-method="timeseries"
-file="Noramp_2_cv_high_ru_alpha_disp"
+dir_path = os.path.dirname(os.path.realpath(__file__))
+results_dict="Inferred_params"
+Electrode="Yellow"
+run="Run_6"
+concs=["1e-1M", "1e0M"]
+file_numbers=[str(x) for x in range(1, 4)]
+figure=multiplot(3, 1, **{"harmonic_position":2, "num_harmonics":7, "orientation":"landscape", "fourier_position":1, "plot_width":5, "row_spacing":2, "plot_height":1})
+keys=sorted(figure.axes_dict.keys())
+plot_counter=0
+h_counter=0
+f_counter=0
 CMAES_path=("/").join([upper_level, "Inferred_results", "CMAES"])
-ramp_data_class=single_electron(CMAES_path+"/"+file)
-counter=1
-ramped_file="Ramped_3_cv_high_ru.ts"
-ramp_data_class=single_electron(CMAES_path+"/"+ramped_file, {}, {}, {}, {}, False)
-print(ramp_data_class.simulation_options["dispersion_bins"])
-ramped_optim_list=["E0_mean", "E0_std","k_0","Ru","Cdl","CdlE1", "CdlE2","gamma","omega","cap_phase","phase", "alpha"]
-ramp_data_class.def_optim_list(ramped_optim_list)
-ramp_data_class.dim_dict["CdlE3"]=0
-ramp_data_class.dim_dict["phase"]=0
-ramp_data_class.dim_dict["cap_phase"]=0
-ramp_data_class.simulation_options["GH_quadrature"]=True
-ramp_data_class.simulation_options["dispersion_bins"]=[16, 16]
-ramped_data_path=("/").join([upper_level, "experimental_data", "Ramped"])
-start_harm=2
-end_harm=7
-ramp_data_harm_class=harmonics(list(range(start_harm, end_harm)), ramp_data_class.dim_dict["omega"], 0.05)
-harmonic_range=list(range(start_harm, end_harm))
-ramp_data_class.harmonic_range=harmonic_range
-method="timeseries"
-i="1"
-ramped_current_results=np.loadtxt(ramped_data_path+"/Yellow_Electrode_Ramped_"+str(i)+"_cv_current")
-ramped_voltage_results=np.loadtxt(ramped_data_path+"/Yellow_Electrode_Ramped_"+str(i)+"_cv_voltage")[:,1]
-ramped_time_results=ramped_current_results[:,0]
-ramped_current_results=ramped_current_results[:,1]
-ramped_data_harmonics=ramp_data_harm_class.generate_harmonics(ramped_time_results, ramped_current_results)
-values=[[0.24116928285797873, 0.044189985533550226, 135.53440184454033, 510.6019261842285, 7.57155256924869e-05, 0.001459719577206274, -0.00037125091413634306, 7.200978526571967e-11, 8.884799587792013, 0, 0.5973834903322666, 0.1788138464200429],
-        [0.22925918516708654, 0.04595696579195954, 123.33007397100599, 873.5412252656006, 3.3412012933121965e-05, 0.057928207116134806, -0.0021217096115628917, 7.178042062464878e-11, 8.884751771027027, 0,0.43751189633466997,  0.15509617967563671]]
-ramp_data_class.dim_dict["alpha_mean"]=None
-ramp_data_class.dim_dict["alpha_std"]=None
-ramp_data_class.param_bounds["alpha_mean"]=[0.4, 0.6]
-ramp_data_class.param_bounds["alpha_std"]=[0.01, 0.1]
-master_optim_list=["E0_mean","E0_std","k_0","Ru","Cdl","CdlE1", "CdlE2","gamma","omega","phase", "alpha_mean", "alpha_std"]
-ramp_data_class.def_optim_list(master_optim_list)
-axes=multiplot(1, 2, **{"harmonic_position":0, "num_harmonics":5, "orientation":"landscape", "plot_width":5})
-ramp_data_class.harmonic_range=harmonic_range
-j=0
-labels=["Sinusoidal parameters", "Ramped parameters", "Interpolated+shifted"]
-for i in range(0, 2):
-    ramped_time_series=ramp_data_class.i_nondim(ramp_data_class.test_vals(values[i], "timeseries"))
-    alpha_val=round(ramp_data_class.dim_dict["alpha"],3)
-    ramped_times=ramp_data_class.t_nondim(ramp_data_class.time_vec[ramp_data_class.time_idx:])
-    ramped_harmonics=ramp_data_harm_class.generate_harmonics(ramped_times, ramped_time_series)
-    for harm_counter in range(0, len(ramped_harmonics),1):
-        ax=axes.axes_dict["row1"][j]
-        ax.plot(ramped_times, (ramped_harmonics[harm_counter,:]*1e6), label="Sim")
-        ax.plot(ramped_time_results, (ramped_data_harmonics[harm_counter,:]*1e6), label="Data", alpha=0.6)
-        ax2=ax.twinx()
-        ax2.set_ylabel(harmonic_range[harm_counter], rotation=0)
+plt.rcParams.update({'font.size': 9})
+def RMSE(series1, series2):
+    return np.sqrt((np.sum(1/(len(series1))*np.power(np.subtract(series1, series2),2))))
+for i in range(10,11):
+    file="Noramp_"+str(i)+"_cv_high_ru_alpha_disp"
+    method="timeseries"
+    master_optim_list=["E0_mean", "E0_std","k_0","Ru","Cdl","CdlE1", "CdlE2","gamma","omega","cap_phase","phase", "alpha"]
+    noramp_results=single_electron(CMAES_path+"/"+file)
+    master_optim_list=["E0_mean", "E0_std", "k_0","Ru","Cdl","CdlE1", "CdlE2","gamma","omega","cap_phase","phase", "alpha_mean", "alpha_std"]
+    param_vals=([noramp_results.save_dict["params"][0][noramp_results.save_dict["optim_list"].index(key)] if  (key in noramp_results.save_dict["optim_list"]) else noramp_results.dim_dict[key] for key in master_optim_list])
+    noramp_results.simulation_options["dispersion_bins"]=[5,5]
+    noramp_results.def_optim_list(master_optim_list)
+    cmaes_time=noramp_results.i_nondim(noramp_results.test_vals(param_vals, method))
+    current_results=noramp_results.i_nondim(noramp_results.other_values["experiment_current"])#[0::dec_amount]
+    voltage_results=noramp_results.e_nondim(noramp_results.other_values["experiment_voltage"])#[0::dec_amount]
+    print_vals=np.append(param_vals, RMSE(current_results, cmaes_time)*1e6)
+    print(list(print_vals), ",")
+    harms=harmonics(range(1, 8),noramp_results.dim_dict["omega"] , 0.05)
+    time_results=noramp_results.t_nondim(noramp_results.other_values["experiment_time"])#[0::dec_amount]
+    figure.axes_dict[keys[0]][plot_counter].plot(voltage_results*1e3, (cmaes_time)*1e3, label="Sim")
+    figure.axes_dict[keys[0]][plot_counter].plot(voltage_results*1e3,(current_results)*1e3, alpha=0.5, label="Exp")
+    figure.axes_dict[keys[0]][plot_counter].set_xlabel("Voltage(mV vs. Ref.)")
+    figure.axes_dict[keys[0]][plot_counter].set_ylabel("Current(mA)")
+    figure.axes_dict[keys[0]][plot_counter].plot(voltage_results*1e3, np.subtract(cmaes_time*1e3, current_results*1e3), label="Residual")
+    figure.axes_dict[keys[0]][plot_counter].legend()
+    plot_counter+=1
+    harms.harmonic_selecter(figure.axes_dict[keys[1]][f_counter], cmaes_time, time_results,  box=False, arg=np.real, line_label="Sim")
+    harms.harmonic_selecter(figure.axes_dict[keys[1]][f_counter],current_results, time_results,  box=False, arg=np.real, line_label="Exp", alpha=0.5)
+    figure.axes_dict[keys[1]][f_counter].set_xlabel("Frequency(Hz)")
+    figure.axes_dict[keys[1]][f_counter].set_ylabel("Real")
+    figure.axes_dict[keys[1]][f_counter].legend(bbox_to_anchor=(-0.32, 0.25), loc="upper left")
+    f_counter+=1
+    harms.harmonic_selecter(figure.axes_dict[keys[1]][f_counter], cmaes_time, time_results, box=False, arg=np.imag,line_label="Sim")
+    harms.harmonic_selecter(figure.axes_dict[keys[1]][f_counter],  current_results,  time_results,box=False, arg=np.imag, line_label="Exp", alpha=0.5)
+    figure.axes_dict[keys[1]][f_counter].set_xlabel("Frequency(Hz)")
+    figure.axes_dict[keys[1]][f_counter].set_ylabel("Imag.")
+
+    f_counter+=1
+    data_harms=harms.generate_harmonics(time_results, cmaes_time)
+    print(len(data_harms))
+    exp_harms=harms.generate_harmonics(time_results, current_results)
+    for q in range(0, len(data_harms)):
+        print(q)
+        figure.axes_dict[keys[2]][h_counter].plot(voltage_results*1e3, data_harms[q]*1e6, label="Sim")
+        figure.axes_dict[keys[2]][h_counter].plot(voltage_results*1e3, exp_harms[q]*1e6, alpha=0.5, label="Exp")
+        lb, ub = figure.axes_dict[keys[2]][h_counter].get_ylim( )
+        figure.axes_dict[keys[2]][h_counter].set_yticks([round(x,1) for x in np.linspace(0.5*lb, 0.5*ub, 2)])
+        ax2=figure.axes_dict[keys[2]][h_counter].twinx()
+        ax2.set_ylabel(harms.harmonics[q], rotation=0)
         ax2.set_yticks([])
-        if harm_counter%3==2:
-            ax.set_ylabel("Current($\mu$A)")
-        if harm_counter==(len(ramped_harmonics)-1):
-            ax.set_xlabel("Time(s)")
-            if i==0:
-                ax.legend(bbox_to_anchor=[1.3, -1], loc="lower right")
+        if q==len(data_harms)//2:
+            figure.axes_dict[keys[2]][h_counter].set_ylabel("Current($\mu$A)")
+        if q==len(data_harms)-1:
+            figure.axes_dict[keys[2]][h_counter].set_xlabel("Voltage(mV vs. Ref.)")
+            figure.axes_dict[keys[2]][h_counter].legend(framealpha=1.0,bbox_to_anchor=(-0.3, 0.0), loc="upper left")
         else:
-            ax.set_xticks([])
-        j+=1
+            figure.axes_dict[keys[2]][h_counter].set_xticks([])
+        h_counter+=1
 fig=plt.gcf()
-fig.set_size_inches((7, 4.5))
+plt.subplots_adjust(left=0.23, bottom=0.08, right=0.97, top=0.99, wspace=0.2, hspace=0.02)
+fig.set_size_inches((3.25, 7.5))
 plt.show()
-save_path="Ramped_comparison.png"
+save_path="Alice_"+str(i)+"_sims.png"
 fig.savefig(save_path, dpi=500)
+
+plt.show()

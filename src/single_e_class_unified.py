@@ -57,9 +57,9 @@ class single_electron:
             if simulation_options["method"]=="sinusoidal":
                 time_end=(self.nd_param.nd_param_dict["num_peaks"]/self.nd_param.nd_param_dict["omega"])
             elif simulation_options["method"]=="ramped":
-                time_end=2*(self.nd_param.nd_param_dict["E_reverse"]-self.nd_param.nd_param_dict["E_start"])*self.nd_param.c_T0
+                time_end=2*(self.nd_param.nd_param_dict["E_reverse"]-self.nd_param.nd_param_dict["E_start"])
             elif simulation_options["method"]=="dcv":
-                time_end=2*(self.nd_param.nd_param_dict["E_reverse"]-self.nd_param.nd_param_dict["E_start"])*self.nd_param.c_T0
+                time_end=2*(self.nd_param.nd_param_dict["E_reverse"]-self.nd_param.nd_param_dict["E_start"])
             if simulation_options["no_transient"]!=False:
                 if simulation_options["no_transient"]>time_end:
                     warnings.warn("Previous transient removal method detected")
@@ -81,9 +81,10 @@ class single_electron:
                 other_values["experiment_voltage"]=other_values["experiment_voltage"][desired_idx]/self.nd_param.c_E0
             else:
                 if simulation_options["method"]=="sinusoidal":
-                    self.nd_param.nd_param_dict["time_end"]=(self.nd_param.nd_param_dict["num_peaks"])#/self.nd_param.nd_param_dict["omega"])
+                    self.nd_param.nd_param_dict["time_end"]=(self.nd_param.nd_param_dict["num_peaks"])
                 else:
-                    self.nd_param.nd_param_dict["time_end"]=2*(self.nd_param.nd_param_dict["E_reverse"]-self.nd_param.nd_param_dict["E_start"])/self.nd_param.nd_param_dict["v"]
+                    self.nd_param.nd_param_dict["time_end"]=2*(self.nd_param.nd_param_dict["E_reverse"]-self.nd_param.nd_param_dict["E_start"])
+                    print(self.nd_param.nd_param_dict["time_end"])
                 self.times()
         else:
             if simulation_options["method"]=="sinusoidal":
@@ -109,6 +110,8 @@ class single_electron:
         if self.simulation_options["experimental_fitting"]==True:
             self.secret_data_fourier=self.top_hat_filter(other_values["experiment_current"])
             self.secret_data_time_series=other_values["experiment_current"]
+        if "debug" not in self.simulation_options:
+            self.simulation_options["debug"]=-1
     def GH_setup(self):
         """
         We assume here that for n>1 normally dispersed parameters then the order of the integral
@@ -354,7 +357,7 @@ class single_electron:
         for i in range(0, len(self.weights)):
             for j in range(0, len(sim_params)):
                 self.nd_param_dict[sim_params[j]]=self.values[i][j]
-            time_series_current=solver(self.nd_param_dict, self.time_vec,self.simulation_options["method"], -1, self.bounds_val)
+            time_series_current=solver(self.nd_param_dict, self.time_vec,self.simulation_options["method"], self.simulation_options["debug"], self.bounds_val)
             time_series=np.add(time_series, np.multiply(time_series_current, np.prod(self.weights[i])))
         return time_series
     def numerical_plots(self, solver):
@@ -412,7 +415,7 @@ class single_electron:
             if self.simulation_options["dispersion"]==True:
                 time_series=self.paralell_disperse(solver)
             else:
-                time_series=solver(self.nd_param_dict, self.time_vec, self.simulation_options["method"],-1, self.bounds_val)
+                time_series=solver(self.nd_param_dict, self.time_vec, self.simulation_options["method"],self.simulation_options["debug"], self.bounds_val)
         time_series=np.array(time_series)
         self.count+=1
         if self.simulation_options["no_transient"]!=False:

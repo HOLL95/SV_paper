@@ -37,11 +37,12 @@ ramp_data_class.dim_dict["CdlE3"]=0
 ramp_data_class.dim_dict["phase"]=0
 ramp_data_class.dim_dict["cap_phase"]=0
 ramp_data_class.simulation_options["GH_quadrature"]=True
-ramp_data_class.simulation_options["dispersion_bins"]=[16, 16]
+ramp_data_class.simulation_options["dispersion_bins"]=[2, 2]
 ramped_data_path=("/").join([upper_level, "experimental_data", "Ramped"])
 start_harm=2
 end_harm=7
-ramp_data_harm_class=harmonics(list(range(start_harm, end_harm)), ramp_data_class.dim_dict["omega"], 0.05)
+print("omega", ramp_data_class.dim_dict["omega"])
+ramp_data_harm_class=harmonics(list(range(start_harm, end_harm)), 8.884799587792013, 0.05)
 harmonic_range=list(range(start_harm, end_harm))
 ramp_data_class.harmonic_range=harmonic_range
 method="timeseries"
@@ -59,28 +60,31 @@ ramp_data_class.param_bounds["alpha_mean"]=[0.4, 0.6]
 ramp_data_class.param_bounds["alpha_std"]=[0.01, 0.1]
 master_optim_list=["E0_mean","E0_std","k_0","Ru","Cdl","CdlE1", "CdlE2","gamma","omega","phase", "alpha_mean", "alpha_std"]
 ramp_data_class.def_optim_list(master_optim_list)
-axes=multiplot(1, 2, **{"harmonic_position":0, "num_harmonics":5, "orientation":"landscape", "plot_width":5})
+axes=multiplot(1, 1, **{"harmonic_position":0, "num_harmonics":5, "orientation":"landscape", "plot_width":5})
 ramp_data_class.harmonic_range=harmonic_range
 j=0
 labels=["Sinusoidal parameters", "Ramped parameters", "Interpolated+shifted"]
-for i in range(0, 2):
-    ramped_time_series=ramp_data_class.i_nondim(ramp_data_class.test_vals(values[i], "timeseries"))
+ramp_data_harm_class2=harmonics(list(range(start_harm, end_harm)), 8.95, 0.05)
+ramped_harmonics2=ramp_data_harm_class2.generate_harmonics(ramped_time_results, ramped_current_results)
+for i in range(0, 1):
+    #ramped_time_series=ramp_data_class.i_nondim(ramp_data_class.test_vals(values[i], "timeseries"))
     alpha_val=round(ramp_data_class.dim_dict["alpha"],3)
     ramped_times=ramp_data_class.t_nondim(ramp_data_class.time_vec[ramp_data_class.time_idx])
-    ramped_harmonics=ramp_data_harm_class.generate_harmonics(ramped_times, ramped_time_series)
-    for harm_counter in range(0, len(ramped_harmonics),1):
+    #ramped_harmonics=ramp_data_harm_class.generate_harmonics(ramped_times, ramped_time_series)
+    for harm_counter in range(0, len(ramped_data_harmonics),1):
         ax=axes.axes_dict["row1"][j]
-        ax.plot(ramped_times, (ramped_harmonics[harm_counter,:]*1e6), label="Sim")
-        ax.plot(ramped_time_results, (ramped_data_harmonics[harm_counter,:]*1e6), label="Exp", alpha=0.6)
+        ax.plot(ramped_time_results, (ramped_harmonics2[harm_counter,:]*1e6), label="8.94")
+        ax.plot(ramped_time_results, (ramped_data_harmonics[harm_counter,:]*1e6), label="8.884", alpha=0.6)
         ax2=ax.twinx()
         ax2.set_ylabel(harmonic_range[harm_counter], rotation=0)
         ax2.set_yticks([])
         if harm_counter%3==2:
             ax.set_ylabel("Current($\mu$A)")
-        if harm_counter==(len(ramped_harmonics)-1):
+        if harm_counter==0:
+            ax.legend(loc="lower right")
+        if harm_counter==(len(ramped_data_harmonics)-1):
             ax.set_xlabel("Time(s)")
-            if i==0:
-                ax.legend(bbox_to_anchor=[1.3, -1], loc="lower right")
+
         else:
             ax.set_xticks([])
         j+=1

@@ -23,7 +23,7 @@ class dispersion:
                     raise ValueError("Normal distribution requires "+self.simulation_options["dispersion_parameters"][i]+"_mean and " + self.simulation_options["dispersion_parameters"][i]+"_std")
             elif self.simulation_options["dispersion_distributions"][i]=="lognormal":
                 if (self.simulation_options["dispersion_parameters"][i]+"_shape" not in optim_list)  or (self.simulation_options["dispersion_parameters"][i]+"_scale" not in optim_list):
-                    raise ValueError("Lognormal distribution requires "+self.simulation_options["dispersion_parameters"][i]+"_shape and "  + self.simulation_options["dispersion_parameters"][i]+"_scale")
+                    raise ValueError("Lognormal distribution requires "+self.simulation_options["dispersion_parameters"][i]+"_shape and " + self.simulation_options["dispersion_parameters"][i]+"_loc and "  + self.simulation_options["dispersion_parameters"][i]+"_scale")
             else:
                 raise KeyError(self.simulation_options["dispersion_distributions"][i]+" distribution not implemented")
     def generic_dispersion(self, nd_dict, GH_dict=None):
@@ -63,7 +63,8 @@ class dispersion:
                     param_weights=np.zeros(self.simulation_options["dispersion_bins"][i])
                     param_weights[0]=lognorm.cdf(param_vals[0],param_shape, loc=param_loc, scale=param_scale)
                     param_midpoints=np.zeros(self.simulation_options["dispersion_bins"][i])
-                    param_midpoints[0]=lognorm.ppf((1e-4/2), param_shape, loc=param_loc, scale=param_scale)
+                    param_midpoints[0]=lognorm.ppf((1e-4/2),param_shape,  loc=param_loc, scale=param_scale)
+                    print(param_loc)
                     for j in range(1, self.simulation_options["dispersion_bins"][i]):
                         param_weights[j]=lognorm.cdf(param_vals[j],param_shape, loc=param_loc, scale=param_scale)-lognorm.cdf(param_vals[j-1],param_shape, loc=param_loc, scale=param_scale)
                         param_midpoints[j]=(param_vals[j-1]+param_vals[j])/2
