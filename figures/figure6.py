@@ -25,7 +25,7 @@ file="Noramp_2_cv_high_ru_alpha_disp"
 CMAES_path=("/").join([upper_level, "Inferred_results", "CMAES"])
 ramp_data_class=single_electron(CMAES_path+"/"+file)
 counter=1
-ramped_file="Ramped_3_cv_high_ru.ts"
+ramped_file="Ramped_1_cv_high_ru.ts"
 ramp_data_class=single_electron(CMAES_path+"/"+ramped_file, {}, {}, {}, {}, False)
 print(ramp_data_class.simulation_options["dispersion_bins"])
 ramped_optim_list=["E0_mean", "E0_std","k_0","Ru","Cdl","CdlE1", "CdlE2","gamma","omega","cap_phase","phase", "alpha_mean", "alpha_std"]
@@ -39,7 +39,7 @@ ramp_data_class.dim_dict["CdlE3"]=0
 ramp_data_class.dim_dict["phase"]=0
 ramp_data_class.dim_dict["cap_phase"]=0
 ramp_data_class.simulation_options["GH_quadrature"]=True
-ramp_data_class.simulation_options["dispersion_bins"]=[16, 16]
+ramp_data_class.simulation_options["dispersion_bins"]=[8, 8]
 ramped_data_path=("/").join([upper_level, "experimental_data", "Ramped"])
 start_harm=2
 end_harm=7
@@ -53,7 +53,7 @@ ramped_voltage_results=np.loadtxt(ramped_data_path+"/Yellow_Electrode_Ramped_"+s
 ramped_time_results=ramped_current_results[:,0]
 ramped_current_results=ramped_current_results[:,1]
 ramped_data_harmonics=ramp_data_harm_class.generate_harmonics(ramped_time_results, ramped_current_results)
-values=[[0.24055747088306997, 0.05047523191357855, 176.56116945811587, 474.43867201525205, 7.584083348640005e-05, 0.0021028609527935505, -0.0004094927674505519, 7.146018738751102e-11, 8.88475177102702,0,0.6246797783009037, 0.1779493870477656],
+values=[[0.24104077257356016, 0.04822222516745041, 136.21226784716907, 499.1320881553376, 7.536648201779282e-05, 0.002276590199750461, -0.00041060653577303097, 7.166495676058657e-11, 8.884751771027027, 0,0.5991396192217785, 0.19107119521261018],
         [0.22925918516708654, 0.04595696579195954, 123.33007397100599, 873.5412252656006, 3.3412012933121965e-05, 0.057928207116134806, -0.0021217096115628917, 7.178042062464878e-11, 8.884751771027027, 0,0.43751189633466997,  0.15509617967563671]]
 ramp_data_class.dim_dict["alpha_mean"]=None
 ramp_data_class.dim_dict["alpha_std"]=None

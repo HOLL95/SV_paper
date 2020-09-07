@@ -102,7 +102,7 @@ def chain_appender(chains, param):
         new_chain=np.append(new_chain, chains[i, :, param])
     return new_chain
 all_params=['E0_mean', "E0_std",'k_0',"Ru","Cdl", "CdlE1", "CdlE2",'gamma',"omega", "cap_phase","phase", "alpha_std", "noise"]
-optim_list=['E0_mean', "E0_std",'k_0',"Ru", "phase", "cap_phase","alpha_std"]
+optim_list=['E0_mean', "E0_std",'k_0',"Ru", "phase", "cap_phase", "noise"]
 positions=[all_params.index(x) for x in optim_list]
 titles=[fancy_names[x]+"("+unit_dict[x]+")" if (unit_dict[x]!="") else fancy_names[x] for x in optim_list]
 n_param=len(titles)
@@ -122,7 +122,7 @@ def plot_kde_2d(x, y, ax):
     ax.set_xlim(xmin, xmax)
     ax.set_ylim(ymin, ymax)
     ax.scatter(x, y, s=0.5, alpha=0.5)
-run="run24"
+run="_run_25"
 num=["_"+str(x)+"_" for x in range(10, 11)]
 for number in num:
     for file in files:
@@ -166,7 +166,7 @@ for number in num:
             fig = plt.gcf()
             fig.set_size_inches((14,9))
             save_path="Alice__10__2d_plots.png"
-            #plt.show()
+            plt.show()
             fig.savefig(save_path, dpi=500)
             if resize==True:
                 img = Image.open(save_path)

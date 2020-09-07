@@ -4,6 +4,7 @@ import matplotlib as mpl
 import pints
 import os
 import sys
+import time
 try:
     from PIL import Image
     resize=True
@@ -104,18 +105,18 @@ CMAES_path=("/").join([upper_level, "Inferred_results", "CMAES"])
 noramp_results=single_electron(CMAES_path+"/"+file)
 print(noramp_results.dim_dict["num_peaks"])
 noramp_results.simulation_options["dispersion_bins"]=[15,15]
-noramp_results.dim_dict["sampling_freq"]=1/2000.0
+noramp_results.dim_dict["sampling_freq"]=1/200.0
+noramp_results.time_vec=noramp_results.time_vec[0::3]
 noramp_results.dim_dict["phase"]=3*math.pi/2
 plot_params=["E0_mean", "E0_std","k_0","Ru","Cdl","CdlE1", "cap_phase", "alpha_mean", "alpha_std"]
-param_vals=[0.25, 0.05, 0.1, 100,1e-5, 1e-5,3*math.pi/2, 0.5, 0.05]
+param_vals=[0.25, 0.05, 100, 100,1e-5, 1e-5,3*math.pi/2, 0.5, 0.05]
 noramp_results.dim_dict["Cdl"]=1e-5
 noramp_results.dim_dict["CdlE1"]=0
 noramp_results.dim_dict["CdlE2"]=0
 noramp_results.def_optim_list(plot_params)
 cmaes_time=noramp_results.i_nondim(noramp_results.test_vals(param_vals, method))
-current_results=noramp_results.i_nondim(noramp_results.other_values["experiment_current"])
-voltage_results=noramp_results.e_nondim(noramp_results.other_values["experiment_voltage"])
-time_results=noramp_results.t_nondim(noramp_results.other_values["experiment_time"])
+voltage_results=noramp_results.e_nondim(noramp_results.define_voltages()[noramp_results.time_idx])
+time_results=noramp_results.t_nondim(noramp_results.time_vec[noramp_results.time_idx])
 start_harm=3
 harms=harmonics(range(start_harm, start_harm+num_harms),noramp_results.dim_dict["omega"] , 0.05)
 num_scans=4
@@ -141,8 +142,9 @@ for j in range(0,len(plot_params)):#
     values=value_list[j]
     for q in range(0, num_scans):
         new_params[j]=values[q]
+        start=time.time()
         cmaes_time=noramp_results.i_nondim(noramp_results.test_vals(new_params, method))
-
+        print(noramp_results.dim_dict["sampling_freq"], time.time()-start)
         ax=axes[row_idx, col_idx]
         xlims=ax.get_xlim()
         ax.set_xlim(noramp_results.dim_dict["E_start"], 0.8)

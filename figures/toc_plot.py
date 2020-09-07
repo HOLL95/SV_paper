@@ -38,16 +38,17 @@ for i in range(1,11):
     noramp_results=single_electron(CMAES_path+"/"+file)
     master_optim_list=["E0_mean", "E0_std", "k_0","Ru","Cdl","CdlE1", "CdlE2","gamma","omega","cap_phase","phase", "alpha_mean", "alpha_std"]
     param_vals=([noramp_results.save_dict["params"][2][noramp_results.save_dict["optim_list"].index(key)] if  (key in noramp_results.save_dict["optim_list"]) else noramp_results.dim_dict[key] for key in master_optim_list])
-    noramp_results.simulation_options["dispersion_bins"]=[8,8]
-    noramp_results.dim_dict["simulation_freq"]=1/2000.0
+    noramp_results.simulation_options["dispersion_bins"]=[5,5]
+    #print(noramp_results.dim_dict["sampling_freq"])
+    noramp_results.dim_dict["sampling_freq"]=1/200.0
     noramp_results.def_optim_list(master_optim_list)
     cmaes_time=noramp_results.i_nondim(noramp_results.test_vals(param_vals, method))
     current_results=noramp_results.i_nondim(noramp_results.other_values["experiment_current"])#[0::dec_amount]
     voltage_results=noramp_results.e_nondim(noramp_results.other_values["experiment_voltage"])#[0::dec_amount]
-    print_vals=np.append(param_vals, RMSE(current_results, cmaes_time)*1e6)
+    #print_vals=np.append(param_vals, RMSE(current_results, cmaes_time)*1e6)
 
-    print(list(print_vals), ",")
-    """
+    #print(list(print_vals), ",")
+
     harms=harmonics(range(1, 8),noramp_results.dim_dict["omega"] , 0.05)
     time_results=noramp_results.t_nondim(noramp_results.other_values["experiment_time"])#[0::dec_amount]
     plt.plot(voltage_results*1e3, (cmaes_time)*1e3, label="Simulation")
@@ -59,6 +60,5 @@ for i in range(1,11):
 
     fig.set_size_inches((3.25, 1.75))
     plt.show()
-    save_path="toc_graphic.png"
-    fig.savefig(save_path, dpi=500)
-    """
+    #save_path="toc_graphic.png"
+    #fig.savefig(save_path, dpi=500)

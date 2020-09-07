@@ -32,7 +32,7 @@ file="Noramp_2_cv_high_ru_alpha_disp"
 CMAES_path=("/").join([upper_level, "Inferred_results", "CMAES"])
 noramp_results=single_electron(CMAES_path+"/"+file)
 counter=1
-ramped_file="Ramped_3_cv_high_ru.ts"
+ramped_file="Ramped_1_cv_high_ru.ts"
 ramp_data_class=single_electron(CMAES_path+"/"+ramped_file, {}, {}, {}, {}, False)
 master_optim_list=["E0_mean", "E0_std","k_0","Ru","Cdl","CdlE1", "CdlE2","gamma","omega","cap_phase","phase", "alpha"]
 param_vals=([noramp_results.save_dict["params"][0][noramp_results.save_dict["optim_list"].index(key)] if  (key in noramp_results.save_dict["optim_list"]) else noramp_results.dim_dict[key] for key in master_optim_list])
@@ -43,6 +43,7 @@ ramp_param_vals=np.delete(param_vals, master_optim_list.index("cap_phase"))
 ramp_data_class.param_bounds=noramp_results.param_bounds
 ramp_data_class.simulation_options["dispersion_bins"]=[5]
 noramp_results.simulation_options["dispersion_bins"]=[5]
+noramp_results.simulation_options["sampling_freq"]=1/200.0
 ramp_data_class.simulation_options["GH_quadrature"]=True
 noramp_results.def_optim_list(master_optim_list)
 ramp_data_class.def_optim_list(["E0_mean", "E0_std","k_0","Ru","Cdl","CdlE1", "CdlE2","gamma","omega","phase", "alpha"])
