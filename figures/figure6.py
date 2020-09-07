@@ -18,6 +18,8 @@ import math
 from multiplotter import multiplot
 from harmonics_plotter import harmonics
 import time
+def RMSE(series1, series2):
+    return np.sqrt((np.sum(1/(len(series1))*np.power(np.subtract(series1, series2),2))))
 method="timeseries"
 file="Noramp_2_cv_high_ru_alpha_disp"
 CMAES_path=("/").join([upper_level, "Inferred_results", "CMAES"])
@@ -51,7 +53,7 @@ ramped_voltage_results=np.loadtxt(ramped_data_path+"/Yellow_Electrode_Ramped_"+s
 ramped_time_results=ramped_current_results[:,0]
 ramped_current_results=ramped_current_results[:,1]
 ramped_data_harmonics=ramp_data_harm_class.generate_harmonics(ramped_time_results, ramped_current_results)
-values=[[0.24116928285797873, 0.044189985533550226, 135.53440184454033, 510.6019261842285, 7.57155256924869e-05, 0.001459719577206274, -0.00037125091413634306, 7.200978526571967e-11, 8.884799587792013, 0, 0.5973834903322666, 0.1788138464200429],
+values=[[0.24055747088306997, 0.05047523191357855, 176.56116945811587, 474.43867201525205, 7.584083348640005e-05, 0.0021028609527935505, -0.0004094927674505519, 7.146018738751102e-11, 8.88475177102702,0,0.6246797783009037, 0.1779493870477656],
         [0.22925918516708654, 0.04595696579195954, 123.33007397100599, 873.5412252656006, 3.3412012933121965e-05, 0.057928207116134806, -0.0021217096115628917, 7.178042062464878e-11, 8.884751771027027, 0,0.43751189633466997,  0.15509617967563671]]
 ramp_data_class.dim_dict["alpha_mean"]=None
 ramp_data_class.dim_dict["alpha_std"]=None
@@ -62,16 +64,22 @@ ramp_data_class.def_optim_list(master_optim_list)
 axes=multiplot(1, 2, **{"harmonic_position":0, "num_harmonics":5, "orientation":"landscape", "plot_width":5})
 ramp_data_class.harmonic_range=harmonic_range
 j=0
+
 labels=["Sinusoidal parameters", "Ramped parameters", "Interpolated+shifted"]
 for i in range(0, 2):
+    errors=[]
     ramped_time_series=ramp_data_class.i_nondim(ramp_data_class.test_vals(values[i], "timeseries"))
     alpha_val=round(ramp_data_class.dim_dict["alpha"],3)
     ramped_times=ramp_data_class.t_nondim(ramp_data_class.time_vec[ramp_data_class.time_idx])
     ramped_harmonics=ramp_data_harm_class.generate_harmonics(ramped_times, ramped_time_series)
     for harm_counter in range(0, len(ramped_harmonics),1):
+        syn_harms=ramped_harmonics[harm_counter,:]*1e6
+        data_harms=ramped_data_harmonics[harm_counter,:]*1e6
+        interped_data=np.interp(ramped_times, ramped_time_results, data_harms)
         ax=axes.axes_dict["row1"][j]
-        ax.plot(ramped_times, (ramped_harmonics[harm_counter,:]*1e6), label="Sim")
-        ax.plot(ramped_time_results, (ramped_data_harmonics[harm_counter,:]*1e6), label="Exp", alpha=0.6)
+        errors.append(RMSE(abs(syn_harms), abs(interped_data)))
+        ax.plot(ramped_times, (syn_harms), label="Sim")
+        ax.plot(ramped_time_results, (data_harms), label="Exp", alpha=0.6)
         ax2=ax.twinx()
         ax2.set_ylabel(harmonic_range[harm_counter], rotation=0)
         ax2.set_yticks([])
@@ -84,6 +92,8 @@ for i in range(0, 2):
         else:
             ax.set_xticks([])
         j+=1
+    print(errors)
+    print("Error", np.mean(errors))
 fig=plt.gcf()
 fig.set_size_inches((7, 4.5))
 plt.show()

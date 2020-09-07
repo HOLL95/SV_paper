@@ -4,6 +4,11 @@ import matplotlib as mpl
 import pints
 import os
 import sys
+try:
+    from PIL import Image
+    resize=True
+except:
+    resize=False
 current_dir=os.getcwd()
 dir_list=current_dir.split("/")
 upper_level_list=dir_list[:dir_list.index("SV_paper")+1]
@@ -97,11 +102,12 @@ method="timeseries"
 file="Noramp_2_cv_high_ru_alpha_disp"
 CMAES_path=("/").join([upper_level, "Inferred_results", "CMAES"])
 noramp_results=single_electron(CMAES_path+"/"+file)
-print(noramp_results.simulation_options["GH_quadrature"])
+print(noramp_results.dim_dict["num_peaks"])
 noramp_results.simulation_options["dispersion_bins"]=[15,15]
+noramp_results.dim_dict["sampling_freq"]=1/2000.0
 noramp_results.dim_dict["phase"]=3*math.pi/2
 plot_params=["E0_mean", "E0_std","k_0","Ru","Cdl","CdlE1", "cap_phase", "alpha_mean", "alpha_std"]
-param_vals=[0.25, 0.05, 100, 100,1e-5, 1e-5,3*math.pi/2, 0.5, 0.05]
+param_vals=[0.25, 0.05, 0.1, 100,1e-5, 1e-5,3*math.pi/2, 0.5, 0.05]
 noramp_results.dim_dict["Cdl"]=1e-5
 noramp_results.dim_dict["CdlE1"]=0
 noramp_results.dim_dict["CdlE2"]=0
@@ -141,7 +147,7 @@ for j in range(0,len(plot_params)):#
         xlims=ax.get_xlim()
         ax.set_xlim(noramp_results.dim_dict["E_start"], 0.8)
         if row_idx==row_len-1:
-            ax.set_xlabel("Voltage(V)")
+            ax.set_xlabel("Potential(V)")
         else:
             ax.set_xticks([])
         if col_idx==0:
@@ -158,7 +164,14 @@ for j in range(0,len(plot_params)):#
 
 fig=plt.gcf()
 fig.set_size_inches((14, 9))
-plt.subplots_adjust(left=0.08, bottom=0.1, right=0.98, top=0.94, wspace=0.23, hspace=0.10)
+plt.subplots_adjust(left=0.08, bottom=0.1, right=0.98, top=0.94, wspace=0.25, hspace=0.10)
 plt.show()
-#save_path="parameter_scans.png"
-#fig.savefig(save_path, dpi=500)
+save_path="parameter_scans.png"
+fig.savefig(save_path, dpi=500)
+if resize==True:
+    img = Image.open(save_path)
+    basewidth = float(img.size[0])//2
+    wpercent = (basewidth/float(img.size[0]))
+    hsize = int((float(img.size[1])*float(wpercent)))
+    img = img.resize((int(basewidth),hsize), Image.ANTIALIAS)
+    img.save(save_path, "PNG", quality=95, dpi=(500, 500))

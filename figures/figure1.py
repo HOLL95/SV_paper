@@ -68,21 +68,21 @@ fourier_funcs=[np.real, np.imag]
 fourier_ylabels=["Real", "Imaginary"]
 fourier_times=[ramp_time_results, time_results]
 fourier_currents=[ramped_cmaes_time, cmaes_time]
-harm_xlabels=["Time(s)", "Voltage(V)"]
+harm_xlabels=["Time(s)", "Potential(V)"]
 fig=multiplot(2, 4, **{"harmonic_position":3, "num_harmonics":num_harms, "fourier_position":2,"orientation":"portrait", "plot_width":6, "col_spacing":2, "font_size":15})
 keys=sorted(fig.axes_dict.keys())
 
 fig.axes_dict["col1"][0].plot(ramp_time_results, ramp_voltage_results)
 fig.axes_dict["col1"][0].set_xlabel("Time(s)")
-fig.axes_dict["col1"][0].set_ylabel("Voltage(V)")
+fig.axes_dict["col1"][0].set_ylabel("Potential(V)")
 fig.axes_dict["col1"][1].plot(voltage_times, voltage_plots)
 fig.axes_dict["col1"][1].set_xlabel("Time(s)")
-fig.axes_dict["col1"][1].set_ylabel("Voltage(V)")
+fig.axes_dict["col1"][1].set_ylabel("Potential(V)")
 fig.axes_dict["col2"][0].plot(ramp_time_results, ramped_cmaes_time)
 fig.axes_dict["col2"][0].set_xlabel("Time(s)")
 fig.axes_dict["col2"][0].set_ylabel("Current(mA)")
 fig.axes_dict["col2"][1].plot(voltage_results, cmaes_time)
-fig.axes_dict["col2"][1].set_xlabel("Voltage(V)")
+fig.axes_dict["col2"][1].set_xlabel("Potential(V)")
 fig.axes_dict["col2"][1].set_ylabel("Current(mA)")
 for i in range(0, 2):
     for j in range(0, 2):
@@ -133,6 +133,7 @@ plt.subplots_adjust(left=0.05, bottom=0.05, right=0.99, top=0.94, wspace=0.29, h
 plt.show()
 save_path="experiment_comparison.png"
 fig.savefig(save_path, dpi=500)
+if resize==True:
     img = Image.open(save_path)
     basewidth = float(img.size[0])//2
     wpercent = (basewidth/float(img.size[0]))
