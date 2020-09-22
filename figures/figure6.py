@@ -17,6 +17,7 @@ import pints.plot
 import math
 from multiplotter import multiplot
 from harmonics_plotter import harmonics
+from matplotlib.ticker import FormatStrFormatter
 import time
 def RMSE(series1, series2):
     return np.sqrt((np.sum(1/(len(series1))*np.power(np.subtract(series1, series2),2))))
@@ -80,6 +81,7 @@ for i in range(0, 2):
         errors.append(RMSE(abs(syn_harms), abs(interped_data)))
         ax.plot(ramped_times, (syn_harms), label="Sim")
         ax.plot(ramped_time_results, (data_harms), label="Exp", alpha=0.6)
+        ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
         ax2=ax.twinx()
         ax2.set_ylabel(harmonic_range[harm_counter], rotation=0)
         ax2.set_yticks([])
@@ -88,14 +90,20 @@ for i in range(0, 2):
         if harm_counter==(len(ramped_harmonics)-1):
             ax.set_xlabel("Time(s)")
             if i==0:
-                ax.legend(bbox_to_anchor=[1.3, -1], loc="lower right")
+                ax.legend(bbox_to_anchor=[1.3, -1.5], loc="lower right")
         else:
             ax.set_xticks([])
         j+=1
     print(errors)
     print("Error", np.mean(errors))
 fig=plt.gcf()
-fig.set_size_inches((7, 4.5))
+plt.subplots_adjust(top=0.97,
+bottom=0.19,
+left=0.1,
+right=0.975,
+hspace=0.2,
+wspace=0.55)
+fig.set_size_inches((7, 3))
 plt.show()
 save_path="Ramped_comparison.png"
 fig.savefig(save_path, dpi=500)

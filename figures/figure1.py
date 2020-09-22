@@ -35,7 +35,7 @@ counter=1
 ramped_file="Ramped_1_cv_high_ru.ts"
 ramp_data_class=single_electron(CMAES_path+"/"+ramped_file, {}, {}, {}, {}, False)
 master_optim_list=["E0_mean", "E0_std","k_0","Ru","Cdl","CdlE1", "CdlE2","gamma","omega","cap_phase","phase", "alpha"]
-param_vals=([noramp_results.save_dict["params"][0][noramp_results.save_dict["optim_list"].index(key)] if  (key in noramp_results.save_dict["optim_list"]) else noramp_results.dim_dict[key] for key in master_optim_list])
+param_vals=([noramp_results.save_dict["params"][2][noramp_results.save_dict["optim_list"].index(key)] if  (key in noramp_results.save_dict["optim_list"]) else noramp_results.dim_dict[key] for key in master_optim_list])
 param_vals[master_optim_list.index("Cdl")]=1e-5
 param_vals[master_optim_list.index("CdlE1")]=0
 param_vals[master_optim_list.index("CdlE2")]=0
@@ -129,7 +129,7 @@ for i in range(0, len(keys)):
         letter_count+=1
 
 fig=plt.gcf()
-fig.set_size_inches((14, 9))
+fig.set_size_inches((14, 7))
 plt.subplots_adjust(left=0.05, bottom=0.05, right=0.99, top=0.94, wspace=0.29, hspace=0.2)
 plt.show()
 save_path="experiment_comparison.png"
